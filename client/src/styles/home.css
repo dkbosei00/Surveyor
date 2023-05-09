@@ -1,0 +1,12 @@
+.red-btn{
+    background: rgba(233, 69, 96, 0.6);
+    border-radius: 8px;
+    color: white;
+}
+
+.price{
+    background: rgba(61, 213, 152, 0.1);
+    border-radius: 6px;
+    color: #3DD598;
+    padding: 2px 6px;
+}
