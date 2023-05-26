@@ -6,7 +6,7 @@ import Tokens from '../components/Tokens'
 
 const Home = () => {
   return (
-    <div className='bg-[#13131A] text-white'>
+    <div className='bg-[#13131A] text-white h-full'>
       <NavBar/>
       <div className='flex place-content-center my-6'>
         <ul className='flex text-[#CFCFCF]'>
