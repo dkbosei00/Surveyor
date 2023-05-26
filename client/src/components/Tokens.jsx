@@ -40,7 +40,6 @@ const Tokens = () => {
             })
             setIsLoading(false)
             let { data, status, error} = res
-            console.log({ "Response": res })
             if(!status){ 
                 if(error.response.status === 429) {
                     setLoadCache(true)
@@ -48,9 +47,7 @@ const Tokens = () => {
                 } 
                 data = null
             }
-            console.log({resData: data})
             setData(data)
-            console.log(data)
 
             const uniqueChains = [...new Set(data?.map(({chain}, i )=> chain.toUpperCase()))];
 
