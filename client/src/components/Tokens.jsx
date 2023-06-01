@@ -5,7 +5,7 @@ import useAPIRequest from '../hooks/useAPIRequest';
 import { setChains } from '../redux/features/chainSlice';
 import { cache_data } from '../data/assets';
 
-const Tokens = () => {
+const Tokens = ({updateData}) => {
 
     const ITEMS_PER_PAGE = 10;
     const dispatch = useDispatch()
@@ -19,6 +19,8 @@ const Tokens = () => {
     const [error, setError] = useState(null)
     const [isLoading, setIsLoading] = useState(false)
     const [loadCache, setLoadCache] = useState(false)
+    const [amountTotal, setAmountTotal] = useState(null);
+    const [currentUrl, setCurrentUrl] = useState(null)
 
     const { postData } = useAPIRequest()
 
@@ -26,8 +28,19 @@ const Tokens = () => {
         fetchTokens()
     }, [])
 
-    useEffect(()=>{
+
+    useEffect(() => {
         getChainSymbol()
+
+        let totalAmount = 0
+
+        data?.filter(e => e.chain.toUpperCase() === chain.toUpperCase()).forEach((item) => {
+            totalAmount = totalAmount + item.amount
+        });
+
+        totalAmount = totalAmount === 0 ? null : totalAmount
+        setAmountTotal(totalAmount);
+
         // window.scrollTo({ top: 0, behavior: 'smooth' });
     }, [chain])
 
@@ -39,17 +52,18 @@ const Tokens = () => {
                 method: 'GET'
             })
             setIsLoading(false)
-            let { data, status, error} = res
-            if(!status){ 
-                if(error.response.status === 429) {
+            let { data, status, error } = res
+            if (!status) {
+                if (error.response.status === 429) {
                     setLoadCache(true)
                     setError(new Error('Too many requests. Please try again later or load cache data'))
-                } 
+                }
                 data = null
             }
             setData(data)
+            updateData(data || cache_data.data)
 
-            const uniqueChains = [...new Set(data?.map(({chain}, i )=> chain.toUpperCase()))];
+            const uniqueChains = [...new Set(data?.map(({ chain }, i) => chain.toUpperCase()))];
 
             dispatch(setChains(uniqueChains));
         }
@@ -58,7 +72,7 @@ const Tokens = () => {
         }
     }
 
-    const assetsByChain = data?.filter(( asset, i) => {
+    const assetsByChain = data?.filter((asset, i) => {
         return asset.chain.toUpperCase() === chain
     })
 
@@ -66,35 +80,50 @@ const Tokens = () => {
         let chainSymbol = document.getElementById('chainSymbol')
         let foundSymbol = false
 
-        data?.forEach((asset, i) => {
-            if(asset.optimized_symbol === chain){
-                chainSymbol.src = asset.logo_url
-                foundSymbol = true
-            }
-        })
+        let url = data?.find(e => e.optimized_symbol.toUpperCase() === chain.toUpperCase())?.logo_url || null
 
-           chainSymbol.style.display = foundSymbol ? '' : 'none'
+        if (!url) {
+            data?.find(e => {
+                const regex = new RegExp(chain.toUpperCase(), "i");
+                if (regex.test(
+                    e.optimized_symbol.toUpperCase()
+                )) url = e?.logo_url
+            })
+
+        }
+
+        console.log(url)
+        setCurrentUrl(url)
+
+        chainSymbol.style.display = url ? '' : 'none'
     }
 
-    const loadCacheData = () =>{
-        setData(cache_data.data); 
+    const loadCacheData = () => {
+        setData(cache_data.data);
         setError(null)
 
-        const uniqueChains = [...new Set(cache_data.data?.map(({chain}, i )=> chain.toUpperCase()))];
+        const uniqueChains = [...new Set(cache_data.data?.map(({ chain }, i) => chain.toUpperCase()))];
 
         dispatch(setChains(uniqueChains));
 
+    }
+
+    const totalAmount = () => {
+        assetsByChain?.reduce((total, item) => {
+            return total + item.amount
+        }, 0)
     }
 
     return (
         <div className='bg-block-color rounded-xl p-6 poppins w-4/5 mx-auto h-fit'>
             <div className='flex justify-between items-center mb-4'>
                 <div className='flex items-center gap-2'>
-                    <img id='chainSymbol' className='w-[32px] h-[32px] rounded-2xl'/>
+                    <img id='chainSymbol' src={currentUrl} className='w-[32px] h-[32px] rounded-2xl' />
                     <p className=''>Assets on {chain}</p>
-                    <div className='price roboto'>
-                        $3,150.32
+                    {amountTotal !== null && <div className='price roboto'>
+                        {amountTotal}
                     </div>
+                    }
                 </div>
                 <div className='text-[#B5B5BE] roboto text-sm flex gap-2 transition-all duration-300'>
                     <button className={` ${currentTab === 'default' ? 'red-btn' : 'bg-block-color'}`}
@@ -118,10 +147,10 @@ const Tokens = () => {
                 {
                     error ? (
                         <div className='flex justify-between w-full items-center'>
-                        <tr>Could not fetch. {error.message}</tr>
-                        <button className={`red-btn`}
-                        onClick={loadCacheData}
-                        >Load Cache Data</button>
+                            <tr>Could not fetch. {error.message}</tr>
+                            <button className={`red-btn`}
+                                onClick={loadCacheData}
+                            >Load Cache Data</button>
                         </div>
                     ) : (
                         isLoading ? (
