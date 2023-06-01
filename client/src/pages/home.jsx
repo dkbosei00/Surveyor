@@ -1,10 +1,12 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import NavBar from '../components/NavBar/NavBar'
 import '../styles/home.css'
 import SideBar from '../components/SideBar/SideBar'
 import Tokens from '../components/Tokens'
 
 const Home = () => {
+  const [data, setData] = useState([])
+
   return (
     <div className='bg-[#13131A] text-white h-full'>
       <NavBar/>
@@ -25,8 +27,8 @@ const Home = () => {
           </ul>
       </div>
       <div className='flex'>
-        <SideBar/>
-        <Tokens/>
+        <SideBar data={data}/>
+        <Tokens updateData={setData}/>
       </div>
     </div>
   )

@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-    chain: 'ETH',
+    chain: '',
     chains: []
 }
 
