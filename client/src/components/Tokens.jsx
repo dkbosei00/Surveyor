@@ -35,7 +35,7 @@ const Tokens = ({updateData}) => {
         let totalAmount = 0
 
         data?.filter(e => e.chain.toUpperCase() === chain.toUpperCase()).forEach((item) => {
-            totalAmount = totalAmount + item.amount
+            totalAmount = totalAmount + (item.price * item.amount)
         });
 
         totalAmount = totalAmount === 0 ? null : totalAmount
@@ -108,12 +108,6 @@ const Tokens = ({updateData}) => {
 
     }
 
-    const totalAmount = () => {
-        assetsByChain?.reduce((total, item) => {
-            return total + item.amount
-        }, 0)
-    }
-
     return (
         <div className='bg-block-color rounded-xl p-6 poppins w-4/5 mx-auto h-fit'>
             <div className='flex justify-between items-center mb-4'>
@@ -121,7 +115,7 @@ const Tokens = ({updateData}) => {
                     <img id='chainSymbol' src={currentUrl} className='w-[32px] h-[32px] rounded-2xl' />
                     <p className=''>Assets on {chain}</p>
                     {amountTotal !== null && <div className='price roboto'>
-                        {amountTotal}
+                        ${amountTotal.toFixed(2)}
                     </div>
                     }
                 </div>
@@ -167,7 +161,7 @@ const Tokens = ({updateData}) => {
                                     </td>
                                     <td className='text-left pl-4 text-[#92929D]'>${price}</td>
                                     <td className='text-left pl-4'>{amount}</td>
-                                    <td className='text-left pl-4'>$1,000</td>
+                                    <td className='text-left pl-4'>${(price * amount).toFixed(2)}</td>
                                 </tr>
                             ))
                         )
