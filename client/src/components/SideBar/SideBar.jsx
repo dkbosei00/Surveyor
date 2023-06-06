@@ -12,6 +12,13 @@ const SideBar = ({ data }) => {
   const chains = useSelector((state) => state.chain.chains)
   const location = useSelector((state) => state.location.location)
 
+  const [chainPercentage, setChainPercentage] = useState(0)
+  const [chainAmount, setChainAmount] = useState(0)
+
+
+  useEffect(()=>{
+    getPercentage()
+  }, [data, chains])
 
   const handleChain = (token) => {
     dispatch(changeChain(token))
@@ -20,6 +27,36 @@ const SideBar = ({ data }) => {
   const handleLocation = (location) => {
     dispatch(changeLocation(location))
   }
+
+  const getPercentage = () => {
+    let totalUSD = 0
+    let chainAmounts = {};
+  
+    data?.forEach((item) => {
+      totalUSD = totalUSD + (item.price * item.amount)
+    });
+  
+    chains.forEach((chain) => {
+      const chainItems = data.filter((item) => item.chain.toUpperCase() === chain.toUpperCase());
+      const chainTotalAmount = chainItems.reduce((acc, item) => acc + (item.price * item.amount), 0);
+      chainAmounts[chain] = chainTotalAmount;
+    });
+  
+    console.log({chainAmounts})
+
+    const chainPercentages = {};
+    chains.forEach((chain) => {
+      const chainPercentage = (chainAmounts[chain] / totalUSD) * 100;
+      chainPercentages[chain] = chainPercentage;
+    });
+
+    console.log({chainPercentages})
+
+
+    setChainAmount(chainAmounts)
+    setChainPercentage(chainPercentages);
+  };
+  
 
   const getUrl = (chain) => {
     try {
@@ -47,18 +84,22 @@ const SideBar = ({ data }) => {
           <p className='mb-4'>Segment by Chains</p>
           {
             chains.length > 0 ? (
-              chains.map((item, index) => (
-                <div
-                  key={index}
-                  onClick={() => handleChain(item)}
-                  className={`flex  ${getUrl(item) ? 'justify-start' : 'justify-center'} gap-2 menu-items p-4 cursor-pointer hover:text-white ${item === chain ? 'selected-item' : ''}`}>
-                  {getUrl(item) && <img src={getUrl(item)} className='w-[32px] h-[32px] rounded-2xl' />}
-                  <div className='text-[#FAFAFB] text-left'>
-                    <p className='text-xs text-[#92929D] mb-1 roboto'>Assets on {item}</p>
-                    <p className='text-sm flex justify-start gap-2 items-baseline'><span>$0</span><span className='text-[10px]'>100%</span></p>
+              chains.map((item, index) => {
+                const percentage = chainPercentage[item] || 0;
+                const USDvalue = chainAmount[item] || 0
+                return(
+                  <div
+                    key={index}
+                    onClick={() => handleChain(item)}
+                    className={`flex  ${getUrl(item) ? 'justify-start' : 'justify-center'} gap-2 menu-items p-4 cursor-pointer hover:text-white ${item === chain ? 'selected-item' : ''}`}>
+                    {getUrl(item) && <img src={getUrl(item)} className='w-[32px] h-[32px] rounded-2xl' />}
+                    <div className='text-[#FAFAFB] text-left'>
+                      <p className='text-xs text-[#92929D] mb-1 roboto'>Assets on {item}</p>
+                      <p className='text-sm flex justify-start gap-2 items-baseline'><span>{USDvalue.toFixed(2)}</span><span className='text-[10px]'>{percentage.toFixed(2)}%</span></p>
+                    </div>
                   </div>
-                </div>
-              ))
+                )
+                })
             ) : (
               <p>Could not fetch.</p>
             )
