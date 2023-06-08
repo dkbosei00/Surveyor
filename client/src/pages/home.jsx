@@ -13,9 +13,10 @@ const Home = () => {
       <div className='flex place-content-center my-6'>
         <ul className='flex text-[#CFCFCF]'>
               <li className=''>
-                <a className='cursor-pointer hover:text-white px-2 border-r border-[#CFCFCF]'>Portfolio</a>
+                {/* <a className='cursor-pointer hover:text-white px-2 border-r border-[#CFCFCF]'>Portfolio</a> */}
+                <p className=' text-white px-2 border-[#CFCFCF]'>Portfolio</p>
               </li>
-              <li className=''>
+              {/* <li className=''>
                 <a className='cursor-pointer hover:text-white px-2 border-r border-[#CFCFCF]'>NFT's</a>
               </li>
               <li className=''>
@@ -23,10 +24,10 @@ const Home = () => {
               </li>
               <li className=''>
                  <a className='cursor-pointer hover:text-white px-2'>Time Machine</a>
-              </li>
+              </li> */}
           </ul>
       </div>
-      <div className='flex'>
+      <div className='flex mb-4'>
         <SideBar data={data}/>
         <Tokens updateData={setData}/>
       </div>
