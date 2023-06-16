@@ -4,6 +4,7 @@ import { data } from '../../data/assets'
 import { useSelector, useDispatch } from "react-redux"
 import { changeChain } from '../../redux/features/chainSlice'
 import { changeLocation } from '../../redux/features/locationSlice'
+import { formatter } from '../../constants'
 
 const SideBar = ({ data }) => {
   const dispatch = useDispatch()
@@ -70,6 +71,8 @@ const SideBar = ({ data }) => {
           )) url = e?.logo_url
         })
 
+        if(chain.toUpperCase() === "BSC") url = 'https://alphawallet.com/wp-content/uploads/2021/02/BNB.png'
+
       }
       return url
     } catch (e) {
@@ -79,14 +82,23 @@ const SideBar = ({ data }) => {
 
   return (
     <>
-      <div className='rounded-xl bg-block-color poppins mx-auto w-[15%] text-sm py-4 h-fit'>
+      <div className='rounded-xl bg-block-color poppins mx-auto w-[17%] text-sm py-4 scrollable-element h-[70vh] overflow-y-scroll'>
         <div className='border-b border-[#44444F] py-4'>
           <p className='mb-4'>Segment by Chains</p>
           {
             chains.length > 0 ? (
-              chains.map((item, index) => {
+              chains
+              .map((item, i) =>{
                 const percentage = chainPercentage[item] || 0;
                 const USDvalue = chainAmount[item] || 0
+                return{
+                  item,
+                  percentage,
+                  USDvalue
+                }
+              })
+              .sort((a, b) => b.percentage - a.percentage)
+              .map(({item, USDvalue, percentage}, index) => {
                 return(
                   <div
                     key={index}
@@ -95,7 +107,7 @@ const SideBar = ({ data }) => {
                     {getUrl(item) && <img src={getUrl(item)} className='w-[32px] h-[32px] rounded-2xl' />}
                     <div className='text-[#FAFAFB] text-left'>
                       <p className='text-xs text-[#92929D] mb-1 roboto'>Assets on {item}</p>
-                      <p className='text-sm flex justify-start gap-2 items-baseline'><span>{USDvalue.toFixed(2)}</span><span className='text-[10px]'>{percentage.toFixed(2)}%</span></p>
+                      <p className='text-sm flex justify-start gap-2 items-baseline'><span>${formatter.format(USDvalue.toFixed(2))}</span><span className='text-[10px]'>{percentage.toFixed(2)}%</span></p>
                     </div>
                   </div>
                 )

@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query';
 import { useDispatch, useSelector } from 'react-redux';
 import useAPIRequest from '../hooks/useAPIRequest';
-import { setChains } from '../redux/features/chainSlice';
+import { setChains, changeChain } from '../redux/features/chainSlice';
 import { cache_data } from '../data/assets';
+import { formatter } from '../constants';
 
 const Tokens = ({updateData}) => {
 
@@ -13,6 +14,7 @@ const Tokens = ({updateData}) => {
     const [currentTab, setCurrentTab] = useState('change')
     const [tokenShown, setTokenShown] = useState(false)
     const chain = useSelector((state) => state.chain.chain)
+    const chains = useSelector((state) => state.chain.chains)
     const location = useSelector((state) => state.location.location)
 
     const [data, setData] = useState([])
@@ -78,7 +80,6 @@ const Tokens = ({updateData}) => {
 
     const getChainSymbol = () => {
         let chainSymbol = document.getElementById('chainSymbol')
-        let foundSymbol = false
 
         let url = data?.find(e => e.optimized_symbol.toUpperCase() === chain.toUpperCase())?.logo_url || null
 
@@ -92,7 +93,6 @@ const Tokens = ({updateData}) => {
 
         }
 
-        console.log(url)
         setCurrentUrl(url)
 
         chainSymbol.style.display = url ? '' : 'none'
@@ -105,52 +105,63 @@ const Tokens = ({updateData}) => {
         const uniqueChains = [...new Set(cache_data.data?.map(({ chain }, i) => chain.toUpperCase()))];
 
         dispatch(setChains(uniqueChains));
+        dispatch(changeChain(uniqueChains[0]))
 
     }
 
     return (
-        <div className='bg-block-color rounded-xl p-6 poppins w-4/5 mx-auto h-fit'>
-            <div className='flex justify-between items-center mb-4'>
-                <div className='flex items-center gap-2'>
-                    <img id='chainSymbol' src={currentUrl} className='w-[32px] h-[32px] rounded-2xl' />
-                    <p className=''>Assets on {chain}</p>
-                    {amountTotal !== null && <div className='price roboto'>
-                        ${amountTotal.toFixed(2)}
-                    </div>
-                    }
-                </div>
-                <div className='text-[#B5B5BE] roboto text-sm flex gap-2 transition-all duration-300'>
-                    <button className={` ${currentTab === 'default' ? 'red-btn' : 'bg-block-color'}`}
-                        onClick={() => setCurrentTab('default')}
-                    >Default</button>
-                    <button className={` ${currentTab === 'change' ? 'red-btn' : 'bg-block-color'}`}
-                        onClick={() => setCurrentTab('change')}
-                    >Change</button>
-                    <button className={` ${currentTab === 'summarized' ? 'red-btn' : 'bg-block-color'}`}
-                        onClick={() => setCurrentTab('summarized')}
-                    >Summarized</button>
-                </div>
-            </div>
-            <table className='w-full border-separate border-spacing-y-6'>
-                <tr className=' uppercase text-[#92929D] text-xs bg-[#292932] rounded-lg py-1'>
-                    <th className='p-2 text-left pl-4'>Token</th>
-                    <th className='p-2 text-left pl-4'>Price</th>
-                    <th className='p-2 text-left pl-4'>Amount</th>
-                    <th className='p-2 text-left pl-4'>USD Value</th>
-                </tr>
+        <div className='bg-block-color rounded-xl p-6 poppins w-4/5 h-[70vh] scrollable-element overflow-y-scroll mx-auto'>
+
+
                 {
                     error ? (
-                        <div className='flex justify-between w-full items-center'>
-                            <tr>Could not fetch. {error.message}</tr>
+                        <div className='w-full items-center'>
+                            <>
+                            <p>
+                                Could not fetch. {error.message}
+                                </p>
                             <button className={`red-btn`}
                                 onClick={loadCacheData}
                             >Load Cache Data</button>
+                            </>
                         </div>
                     ) : (
                         isLoading ? (
                             <tr>Loading...</tr>
                         ) : (
-                            assetsByChain.map(({ logo_url, name, price, amount }, index) => (
+                            <>
+                            <div className='flex justify-between items-center mb-4'>
+                            <div className='flex items-center gap-2'>
+                                <img id='chainSymbol' src={currentUrl} className='w-[32px] h-[32px] rounded-2xl' />
+                                <p className=''>Assets on {chain}</p>
+                                {amountTotal !== null && <div className='price roboto'>
+                                    ${formatter.format(amountTotal.toFixed(2))}
+                                </div>
+                                }
+                            </div>
+                            {/* <div className='text-[#B5B5BE] roboto text-sm flex gap-2 transition-all duration-300'>
+                                <button className={` ${currentTab === 'default' ? 'red-btn' : 'bg-block-color'}`}
+                                    onClick={() => setCurrentTab('default')}
+                                >Default</button>
+                                <button className={` ${currentTab === 'change' ? 'red-btn' : 'bg-block-color'}`}
+                                    onClick={() => setCurrentTab('change')}
+                                >Change</button>
+                                <button className={` ${currentTab === 'summarized' ? 'red-btn' : 'bg-block-color'}`}
+                                    onClick={() => setCurrentTab('summarized')}
+                                >Summarized</button>
+                            </div> */}
+                        </div>
+                            <table className='w-full border-separate border-spacing-y-6'>
+                            <tr className=' uppercase text-[#92929D] text-xs bg-[#292932] rounded-lg py-1'>
+                                <th className='p-2 text-left pl-4'>Token</th>
+                                <th className='p-2 text-left pl-4'>Price</th>
+                                <th className='p-2 text-left pl-4'>Amount</th>
+                                <th className='p-2 text-left pl-4'>USD Value</th>
+                            </tr>
+                            {
+                            assetsByChain
+                            .sort((a,b) => (b.price * b.amount) - (a.price * a.amount))
+                            .map(({ logo_url, name, price, amount }, index) => (
                                 <tr key={index} className='text-sm poppins'>
                                     <td className='flex pl-2 gap-2 items-center'>
                                         <img
@@ -159,16 +170,17 @@ const Tokens = ({updateData}) => {
                                         />
                                         <span className='font-bold'>{name}</span>
                                     </td>
-                                    <td className='text-left pl-4 text-[#92929D]'>${price}</td>
-                                    <td className='text-left pl-4'>{amount}</td>
-                                    <td className='text-left pl-4'>${(price * amount).toFixed(2)}</td>
+                                    <td className='text-left pl-4 text-[#92929D]'>${formatter.format(price)}</td>
+                                    <td className='text-left pl-4'>{formatter.format(amount.toFixed(2))}</td>
+                                    <td className='text-left pl-4'>${formatter.format(Number(price * amount).toFixed(2))}</td>
                                 </tr>
-                            ))
+                            ))}
+                            </table>
+                            </>
                         )
                     )
                 }
 
-            </table>
             {!tokenShown && assetsByChain?.length > 10 && (
                 <button
                     className="w-full bg-[inherit] poppins font-semibold text-xs border-t border-0 rounded-none py-4 border-[#44444F]"
