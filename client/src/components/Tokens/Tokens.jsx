@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query';
 import { useDispatch, useSelector } from 'react-redux';
-import useAPIRequest from '../hooks/useAPIRequest';
-import { setChains, changeChain } from '../redux/features/chainSlice';
-import { cache_data } from '../data/assets';
-import { formatter } from '../constants';
+import useAPIRequest from '../../hooks/useAPIRequest';
+import { setChains, changeChain } from '../../redux/features/chainSlice';
+import { cache_data } from '../../data/assets';
+import { formatter } from '../../constants';
 
-const Tokens = ({updateData}) => {
+const Tokens = ({updateData, address}) => {
 
     const ITEMS_PER_PAGE = 10;
     const dispatch = useDispatch()
@@ -50,7 +50,7 @@ const Tokens = ({updateData}) => {
         try {
             setIsLoading(true)
             const res = await postData({
-                url: 'token/cache_balance_list?user_addr=0xebb8ee4722501358bf70559d26ef6e7b1326b3c6',
+                url: `token/cache_balance_list?user_addr=${address}`,
                 method: 'GET'
             })
             setIsLoading(false)
