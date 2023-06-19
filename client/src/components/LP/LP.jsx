@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import useAPIRequest from '../../hooks/useAPIRequest'
+import { pool_data } from '../../data/assets';
 
 const LP = ({address}) => {
 
@@ -43,6 +44,13 @@ const LP = ({address}) => {
     useEffect(()=>{
         fetchProjects()
     },[])
+
+    const loadCacheData = () => {
+        setData(pool_data);
+        setError(null)
+        console.log(pool_data)
+
+    }
   
   
     return (
@@ -52,12 +60,15 @@ const LP = ({address}) => {
         {
             error ? (
                 <div className='w-full items-center'>
-                    <>
-                    <p>
-                        Could not fetch. {error.message}
-                        </p>
-                    </>
-                </div>
+                <>
+                <p>
+                    Could not fetch. {error.message}
+                    </p>
+                <button className={`red-btn`}
+                    onClick={loadCacheData}
+                >Load Cache Data</button>
+                </>
+            </div>
             ) : (
                 isLoading ? (
                     <tr>Loading...</tr>
@@ -65,114 +76,91 @@ const LP = ({address}) => {
                     <>
                     <div className='flex flex-col justify-between items-center mb-4'>
                 {
-                    data?.map((item, i) => (
+                    data?.map((item, i) => {
+                        console.log(item)
+                        return(
                             <>
                         <p>{item.name}</p>
                         
-                        <p>{item['0'].name}</p>
-                        <table className='w-full border-separate border-spacing-y-6'>
-                        <tr className=' uppercase text-[#92929D] text-xs bg-[#292932] rounded-lg py-1'>
-                            <th className='p-2 text-left pl-4'>Pool</th>
-                            <th className='p-2 text-left pl-4'>Balance</th>
-                            <th className='p-2 text-left pl-4'>USD Value</th>
-                        </tr>
-                        <tr key={i} className='text-sm poppins'>
-                            <td className='flex pl-2 gap-2 items-center'>
 
-                            </td>
-                            <td className='text-left pl-4 text-[#92929D]'></td>
-                            <td className='text-left pl-4'></td>
-                        </tr>
-                        </table>
-                        
-{               
-                item['1'] &&     
-                        <>
-                        <p>{item['1'].name}</p>
-                        <table className='w-full border-separate border-spacing-y-6'>
-                        <tr className=' uppercase text-[#92929D] text-xs bg-[#292932] rounded-lg py-1'>
-                            <th className='p-2 text-left pl-4'>Pool</th>
-                            <th className='p-2 text-left pl-4'>Balance</th>
-                            <th className='p-2 text-left pl-4'>USD Value</th>
-                        </tr>
-                        <tr key={i} className='text-sm poppins'>
-                            <td className='flex pl-2 gap-2 items-center'>
-
-                            </td>
-                            <td className='text-left pl-4 text-[#92929D]'></td>
-                            <td className='text-left pl-4'></td>
-                            <td className='text-left pl-4'></td>
-                        </tr>
-                        </table>
-                        </>
-                        }
-{               
-                item['2'] &&     
-                        <>
-                        <p>{item['2'].name}</p>
-                        <table className='w-full border-separate border-spacing-y-6'>
-                        <tr className=' uppercase text-[#92929D] text-xs bg-[#292932] rounded-lg py-1'>
-                            <th className='p-2 text-left pl-4'>Pool</th>
-                            <th className='p-2 text-left pl-4'>Balance</th>
-                            <th className='p-2 text-left pl-4'>USD Value</th>
-                        </tr>
-                        <tr key={i} className='text-sm poppins'>
-                            <td className='flex pl-2 gap-2 items-center'>
-
-                            </td>
-                            <td className='text-left pl-4 text-[#92929D]'></td>
-                            <td className='text-left pl-4'></td>
-                            <td className='text-left pl-4'></td>
-                        </tr>
-                        </table>
-                        </>
-                        }
-{               
-                item['3'] &&     
-                        <>
-                        <p>{item['3'].name}</p>
-                        <table className='w-full border-separate border-spacing-y-6'>
-                        <tr className=' uppercase text-[#92929D] text-xs bg-[#292932] rounded-lg py-1'>
-                            <th className='p-2 text-left pl-4'>Pool</th>
-                            <th className='p-2 text-left pl-4'>Balance</th>
-                            <th className='p-2 text-left pl-4'>USD Value</th>
-                        </tr>
-                        <tr key={i} className='text-sm poppins'>
-                            <td className='flex pl-2 gap-2 items-center'>
-
-                            </td>
-                            <td className='text-left pl-4 text-[#92929D]'></td>
-                            <td className='text-left pl-4'></td>
-                            <td className='text-left pl-4'></td>
-                        </tr>
-                        </table>
-                        </>
-                        }
-{               
-                item['4'] &&     
-                        <>
-                        <p>{item['4'].name}</p>
-                        <table className='w-full border-separate border-spacing-y-6'>
-                        <tr className=' uppercase text-[#92929D] text-xs bg-[#292932] rounded-lg py-1'>
-                            <th className='p-2 text-left pl-4'>Pool</th>
-                            <th className='p-2 text-left pl-4'>Balance</th>
-                            <th className='p-2 text-left pl-4'>USD Value</th>
-                        </tr>
-                        <tr key={i} className='text-sm poppins'>
-                            <td className='flex pl-2 gap-2 items-center'>
-
-                            </td>
-                            <td className='text-left pl-4 text-[#92929D]'></td>
-                            <td className='text-left pl-4'></td>
-                            <td className='text-left pl-4'></td>
-                        </tr>
-                        </table>
-                        </>
+                        {
+                            Object.keys(item).filter(key => !isNaN(parseInt(key)))
+                            .map(pool => {
+                                const name = item[pool].name
+                                if(name === 'Staked' || name === 'Farming'){
+                                    return(
+                                        <>
+                                        <p>{name}</p>
+                                        <table className='w-full border-separate border-spacing-y-6'>
+                                        <tr className=' uppercase text-[#92929D] text-xs bg-[#292932] rounded-lg py-1'>
+                                            <th className='p-2 text-left pl-4'>Pool</th>
+                                            <th className='p-2 text-left pl-4'>Balance</th>
+                                            <th className='p-2 text-left pl-4'>Rewards</th>
+                                            <th className='p-2 text-left pl-4'>USD Value</th>
+                                        </tr>
+                                        <tr key={i} className='text-sm poppins'>
+                                            <td className='flex pl-2 gap-2 items-center'>
+                
+                                            </td>
+                                            <td className='text-left pl-4 text-[#92929D]'></td>
+                                            <td className='text-left pl-4'></td>
+                                            <td className='text-left pl-4'></td>
+                                        </tr>
+                                        </table>
+                                        </>
+                                    )
+                                } else if(name === 'Locked'){
+                                    return(
+                                        <>
+                                            <p>{name}</p>
+                                            <table className='w-full border-separate border-spacing-y-6'>
+                                            <tr className=' uppercase text-[#92929D] text-xs bg-[#292932] rounded-lg py-1'>
+                                                <th className='p-2 text-left pl-4'>Pool</th>
+                                                <th className='p-2 text-left pl-4'>Balance</th>
+                                                <th className='p-2 text-left pl-4'>Unlock</th>
+                                                <th className='p-2 text-left pl-4'>USD Value</th>
+                                            </tr>
+                                            <tr key={i} className='text-sm poppins'>
+                                                <td className='flex pl-2 gap-2 items-center'>
+    
+                                                </td>
+                                                <td className='text-left pl-4 text-[#92929D]'></td>
+                                                <td className='text-left pl-4'></td>
+                                                <td className='text-left pl-4'></td>
+                                            </tr>
+                                            </table>
+                                        </>
+                                    )
+                                }else if(name === "Liquidity Pool"){
+                                    return(
+                                        <>
+                                            <p>{name}</p>
+                                            <table className='w-full border-separate border-spacing-y-6'>
+                                            <tr className=' uppercase text-[#92929D] text-xs bg-[#292932] rounded-lg py-1'>
+                                                <th className='p-2 text-left pl-4'>Pool</th>
+                                                <th className='p-2 text-left pl-4'>Balance</th>
+                                                <th className='p-2 text-left pl-4'>USD Value</th>
+                                            </tr>
+                                            <tr key={i} className='text-sm poppins'>
+                                                <td className='flex pl-2 gap-2 items-center'>
+    
+                                                </td>
+                                                <td className='text-left pl-4 text-[#92929D]'></td>
+                                                <td className='text-left pl-4'></td>
+                                                <td className='text-left pl-4'></td>
+                                            </tr>
+                                            </table>
+                                        </>
+                                    )
+                                }else{
+                                    return null
+                                }
+                            })
                         }
                         </>
                     
-                        
-                   ))
+                    )
+                    })
                 }
                 </div>
                     </>
