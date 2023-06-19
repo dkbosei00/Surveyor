@@ -1,0 +1,9 @@
+.red-table-title{
+    font-size: 12px;
+    text-align: left;
+    background: rgba(233, 69, 96, 0.6);
+    padding: 4px 8px;
+    align-self: flex-start;
+    border-top-right-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+}
