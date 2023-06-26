@@ -2,14 +2,16 @@ import React, { useEffect, useState } from 'react'
 import NavBar from '../components/NavBar/NavBar'
 import '../styles/home.css'
 import SideBar from '../components/SideBar/SideBar'
-import Tokens from '../components/Tokens'
+import Tokens from '../components/Tokens/Tokens'
+import LP from '../components/LP/LP'
 
 const Home = () => {
   const [data, setData] = useState([])
+  const USER_ADDR = '0xebb8ee4722501358bf70559d26ef6e7b1326b3c6'
 
   return (
     <div className='bg-[#13131A] text-white h-full'>
-      <NavBar/>
+      <NavBar address={USER_ADDR}/>
       <div className='flex place-content-center my-6'>
         <ul className='flex text-[#CFCFCF]'>
               <li className=''>
@@ -29,7 +31,10 @@ const Home = () => {
       </div>
       <div className='flex mb-4'>
         <SideBar data={data}/>
-        <Tokens updateData={setData}/>
+        <Tokens updateData={setData} address={USER_ADDR}/>
+      </div>
+      <div>
+        <LP address={USER_ADDR}/>
       </div>
     </div>
   )

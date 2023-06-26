@@ -1,7 +1,7 @@
 import React from 'react'
 import { bell, logo } from '../../assets'
 
-const NavBar = () => {
+const NavBar = ({address}) => {
   return (
     <div className='w-full bg-block-color py-4 px-8 inter'>
       <div className='flex justify-between mb-4'>
@@ -41,7 +41,7 @@ const NavBar = () => {
           </svg>
           <div className='text-white text-left'>
             <p className='text-2xl font-semibold'>Surveyor Account Address</p>
-            <p className='text-sm'>0x01023jsns0200201212342034032</p>
+            <p className='text-sm'>{address}</p>
           </div>
         </div>
         {/* <div className='flex items-center gap-3 text-sm'>
